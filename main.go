@@ -10,6 +10,7 @@ import (
 	_ "image/png"
 	"log"
 	"net/http"
+	"os"
 )
 
 const maxUploadSize = 10 << 20 // 10mb
@@ -60,11 +61,15 @@ func ReadQRCode(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal("$PORT must be set")
+	}
 	fmt.Println("Starting server")
 	http.HandleFunc("/api/v1/read", ReadQRCode)
 	http.HandleFunc("/",
 		func(w http.ResponseWriter, r *http.Request) { _,_ = w.Write([]byte("Base")) },
 	)
-	log.Fatal(http.ListenAndServe(":80", nil))
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
